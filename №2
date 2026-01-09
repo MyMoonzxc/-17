@@ -1,0 +1,102 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include<locale.h>
+
+int main() {
+    setlocale(LC_ALL, "RUS");
+    int size, i, j, temp, key;
+    int* arr = NULL, * arr1 = NULL, * arr2 = NULL;
+    clock_t start, end;
+    double time1, time2;
+
+    printf("Размер массива: ");
+    scanf("%d", &size);
+
+    // Создаем массивы
+    arr = (int*)malloc(size * sizeof(int));
+    arr1 = (int*)malloc(size * sizeof(int));
+    arr2 = (int*)malloc(size * sizeof(int));
+
+    // Заполняем случайными числами
+    srand(time(NULL));
+    for (i = 0; i < size; i++) {
+        arr[i] = rand() % 1000;
+    }
+
+    // Копируем в оба массива
+    for (i = 0; i < size; i++) {
+        arr1[i] = arr[i];
+        arr2[i] = arr[i];
+    }
+
+    // ===== ПУЗЫРЬКОВАЯ СОРТИРОВКА =====
+    printf("\n1. Пузырьковая сортировка\n");
+    start = clock();
+
+    for (i = 0; i < size - 1; i++) {
+        for (j = 0; j < size - 1 - i; j++) {
+            if (arr1[j] > arr1[j + 1]) {
+                temp = arr1[j];
+                arr1[j] = arr1[j + 1];
+                arr1[j + 1] = temp;
+            }
+        }
+    }
+
+    end = clock();
+    time1 = (double)(end - start) / CLOCKS_PER_SEC;
+    printf("   Заняло: %f секунд\n", time1);
+
+    // ===== СОРТИРОВКА ВСТАВКАМИ =====
+    printf("\n2. Сортировка вставками\n");
+    start = clock();
+
+    for (i = 1; i < size; i++) {
+        key = arr2[i];
+        j = i - 1;
+
+        // Сдвигаем элементы больше key вправо
+        while (j >= 0 && arr2[j] > key) {
+            arr2[j + 1] = arr2[j];
+            j = j - 1;
+        }
+        arr2[j + 1] = key;
+    }
+
+    end = clock();
+    time2 = (double)(end - start) / CLOCKS_PER_SEC;
+    printf("   Заняло: %f секунд\n", time2);
+
+    // ===== РЕЗУЛЬТАТЫ =====
+    printf("\n3. Результаты:\n");
+    printf("   Размер массива: %d\n", size);
+    printf("   Пузырьком: %.6f сек\n", time1);
+    printf("   Вставками: %.6f сек\n", time2);
+
+    if (time1 < time2) {
+        printf("   Пузырьком быстрее на %.2f%%\n", (time2 - time1) / time2 * 100);
+    }
+    else {
+        printf("   Вставками быстрее на %.2f%%\n", (time1 - time2) / time1 * 100);
+    }
+
+    // Проверяем маленькие массивы
+    if (size <= 15) {
+        printf("\nПроверка сортировки:\n");
+        printf("До сортировки:    ");
+        for (i = 0; i < size; i++) printf("%d ", arr[i]);
+        printf("\nПосле пузырьковой:    ");
+        for (i = 0; i < size; i++) printf("%d ", arr1[i]);
+        printf("\nПосле вставок:    ");
+        for (i = 0; i < size; i++) printf("%d ", arr2[i]);
+        printf("\n");
+    }
+
+    // Освобождаем память
+    free(arr);
+    free(arr1);
+    free(arr2);
+
+    return 0;
+}
